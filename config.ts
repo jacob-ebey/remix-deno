@@ -45,14 +45,24 @@ export async function loadConfig({
   if (!rootRouteFile) {
     throw new Error("No root route file found");
   }
-  const routes: ReturnType<typeof remixDefineRoutes> = (await remixFlatRoutes(
-    "routes",
+  let routes: ReturnType<typeof remixDefineRoutes> = (await remixFlatRoutes(
+    path.join(appDirectory, "routes"),
     remixDefineRoutes
   )) as any;
+  routes = Object.entries(routes).reduce(
+    (acc, [routeId, route]) => ({
+      ...acc,
+      [routeId.replace(appDirectory + "/", "")]: {
+        ...route,
+        id: routeId.replace(appDirectory + "/", ""),
+      },
+    }),
+    {}
+  );
   routes.root = {
     path: "",
     id: "root",
-    file: path.relative(appDirectory, rootRouteFile),
+    file: rootRouteFile,
   };
 
   const clientImportMap = await findFile(

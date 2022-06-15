@@ -19,11 +19,7 @@ ${routeEntries
   .map(
     (routeConfig, index) =>
       `import * as route${index} from ${JSON.stringify(
-        "./" +
-          path.relative(
-            config.rootDirectory,
-            path.join(config.appDirectory, routeConfig.file)
-          )
+        "." + routeConfig.file.replace(config.rootDirectory, "")
       )}`
   )
   .join("\n")}
@@ -51,9 +47,7 @@ const routeModules = Object.fromEntries(
   await Promise.all(
     Object.entries(config.routes).map(async ([routeId, route]) => [
       routeId,
-      await import(
-        await Deno.realPath(path.join(config.appDirectory, route.file))
-      ),
+      await import(route.file),
     ])
   )
 );

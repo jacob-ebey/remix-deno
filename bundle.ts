@@ -50,22 +50,14 @@ async function buildClient(config: RemixConfig) {
   const routeExports = await getRouteExports(config);
 
   const entryPoints: esbuildTypes.BuildOptions["entryPoints"] = {
-    "entry.client": path.toFileUrl(await Deno.realPath(config.entryClientFile))
-      .href,
+    "entry.client": path.toFileUrl(config.entryClientFile).href,
   };
   for (const id of Object.keys(config.routes)) {
     // All route entry points are virtual modules that will be loaded by the
     // browserEntryPointsPlugin. This allows us to tree-shake server-only code
     // that we don't want to run in the browser (i.e. action & loader).
-    entryPoints[id] =
-      path.toFileUrl(
-        await Deno.realPath(
-          path.join(config.appDirectory, config.routes[id].file)
-        )
-      ).href + "?browser";
+    entryPoints[id] = path.toFileUrl(config.routes[id].file).href + "?browser";
   }
-
-  console.log(entryPoints);
 
   const buildResult = await esbuild.build({
     absWorkingDir: config.rootDirectory,
@@ -133,12 +125,7 @@ function browserRouteModulesPlugin(
       const routesByFile: Map<string, Route> = new Map();
       for (const key in routeExports) {
         const route = config.routes[key];
-        routesByFile.set(
-          path.toFileUrl(
-            await Deno.realPath(path.join(config.appDirectory, route.file))
-          ).href,
-          route
-        );
+        routesByFile.set(path.toFileUrl(route.file).href, route);
       }
 
       build.onResolve({ filter: suffixMatcher }, (args) => {
@@ -198,9 +185,7 @@ async function getRouteExports(config: RemixConfig) {
   const entryPointsSet = new Set();
   const entryPoints: string[] = [];
   for (const route of Object.values(config.routes)) {
-    const entry = await Deno.realPath(
-      path.join(config.appDirectory, route.file)
-    );
+    const entry = route.file;
     entryPointsSet.add(entry);
     entryPoints.push(entry);
   }
@@ -304,10 +289,7 @@ async function createAssetsManifest(
   const routesByFile: Map<string, Route> = new Map();
   for (const key in config.routes) {
     const route = config.routes[key];
-    routesByFile.set(
-      await Deno.realPath(path.join(config.appDirectory, route.file)),
-      route
-    );
+    routesByFile.set(route.file, route);
   }
 
   let entry: any; //AssetsManifest["entry"] | undefined;

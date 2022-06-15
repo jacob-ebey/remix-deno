@@ -129,7 +129,7 @@ export default async function flatRoutes(
     parentId: "",
     index: false,
   });
-  await visitor(`app/${baseDir}`, async (routeFile: string) => {
+  await visitor(baseDir, async (routeFile: string) => {
     const routeInfo = await getRouteInfo(baseDir, routeFile, options.basePath);
     if (!routeInfo) return;
     routeMap.set(routeInfo.name, routeInfo);
@@ -244,7 +244,7 @@ export async function getRouteInfo(
   }
   return {
     path: url,
-    file: path.join(baseDir, routeFile),
+    file: await Deno.realPath(path.join(baseDir, routeFile)),
     name,
     //parent: parent will be calculated after all routes are defined,
     index:
