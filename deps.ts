@@ -23,4 +23,4 @@ export { cache as esbuildCache } from "https://deno.land/x/esbuild_plugin_cache/
 export { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&target=deno";
 
 // -- remix-flat-routes --
-export { default as remixFlatRoutes } from "https://esm.sh/remix-flat-routes@0.4.3?pin=v86&target=deno";
+// export { default as remixFlatRoutes } from "https://esm.sh/remix-flat-routes@0.4.3?pin=v86&target=deno";
