@@ -8,12 +8,11 @@ export { lookup as mediaTypeLookup } from "https://deno.land/x/media_types@v2.10
 
 // -- esbuild --
 // @deno-types="https://deno.land/x/esbuild@v0.14.39/mod.d.ts"
-import * as esbuildWasm from "https://unpkg.com/esbuild-wasm@0.14.39/esm/browser.js";
-import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.39/mod.js";
+import * as esbuildWasm from "https://unpkg.com/esbuild-wasm@0.14.43/esm/browser.js";
+import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.43/mod.js";
 // @ts-ignore trust me
-const esbuild: typeof esbuildWasm = esbuildNative;
-// const esbuild: typeof esbuildWasm =
-//   Deno.run === undefined ? esbuildWasm : esbuildNative;
+const esbuild: typeof esbuildWasm =
+  Deno.run === undefined ? esbuildWasm : esbuildNative;
 export { esbuild, esbuildWasm as esbuildTypes };
 // export { denoPlugin } from "https://deno.land/x/esbuild_deno_loader@0.5.0/mod.ts";
 // export { cache as esbuildCache } from "https://deno.land/x/esbuild_plugin_cache/mod.ts";

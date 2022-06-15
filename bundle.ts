@@ -5,20 +5,20 @@ import type { RemixConfig } from "./config.ts";
 
 let esbuildInitialized: boolean | Promise<void> = false;
 async function ensureEsbuildInitialized() {
-  // if (esbuildInitialized === false) {
-  //   if (Deno.run === undefined) {
-  //     esbuildInitialized = esbuild.initialize({
-  //       wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
-  //       worker: false,
-  //     });
-  //   } else {
-  //     esbuild.initialize({});
-  //   }
-  //   await esbuildInitialized;
-  //   esbuildInitialized = true;
-  // } else if (esbuildInitialized instanceof Promise) {
-  //   await esbuildInitialized;
-  // }
+  if (esbuildInitialized === false) {
+    if (Deno.run === undefined) {
+      esbuildInitialized = esbuild.initialize({
+        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
+        worker: false,
+      });
+    } else {
+      esbuild.initialize({});
+    }
+    await esbuildInitialized;
+    esbuildInitialized = true;
+  } else if (esbuildInitialized instanceof Promise) {
+    await esbuildInitialized;
+  }
 }
 
 export async function doBuild(config: RemixConfig) {
