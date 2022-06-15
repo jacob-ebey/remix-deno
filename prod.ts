@@ -6,20 +6,25 @@ import { serve } from "./serve.ts";
 
 import * as build from "./remix.gen.ts";
 
-const config = await loadConfig({ mode: "development" });
+try {
+  const config = await loadConfig({ mode: "production" });
 
-const { assetsManifest, staticAssets } = await doBuild(config);
+  const { assetsManifest, staticAssets } = await doBuild(config);
 
-const remixRequestHandler = createRequestHandler({
-  build: {
-    ...build,
-    assets: {
-      ...assetsManifest,
-      url:
-        config.publicPath +
-        `manifest-${assetsManifest.version.toUpperCase()}.js`,
+  const remixRequestHandler = createRequestHandler({
+    build: {
+      ...build,
+      assets: {
+        ...assetsManifest,
+        url:
+          config.publicPath +
+          `manifest-${assetsManifest.version.toUpperCase()}.js`,
+      },
     },
-  },
-});
+  });
 
-await serve({ staticAssets, remixRequestHandler });
+  await serve({ staticAssets, remixRequestHandler });
+} catch (error) {
+  console.error(error);
+  Deno.exit(1);
+}

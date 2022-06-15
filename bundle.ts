@@ -3,7 +3,27 @@ import type { esbuildTypes } from "./deps.ts";
 import { denoPlugin } from "./deno-plugin.ts";
 import type { RemixConfig } from "./config.ts";
 
+let esbuildInitialized: boolean | Promise<void> = false;
+async function ensureEsbuildInitialized() {
+  if (esbuildInitialized === false) {
+    if (Deno.run === undefined) {
+      esbuildInitialized = esbuild.initialize({
+        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
+        worker: false,
+      });
+    } else {
+      esbuild.initialize({});
+    }
+    await esbuildInitialized;
+    esbuildInitialized = true;
+  } else if (esbuildInitialized instanceof Promise) {
+    await esbuildInitialized;
+  }
+}
+
 export async function doBuild(config: RemixConfig) {
+  await ensureEsbuildInitialized();
+
   const {
     buildResult,
     assetsManifest: { url: assetsManifestUrl, ...assetsManifest },
@@ -26,27 +46,7 @@ export async function doBuild(config: RemixConfig) {
   return { assetsManifest, staticAssets };
 }
 
-let esbuildInitialized: boolean | Promise<void> = false;
-async function ensureEsbuildInitialized() {
-  if (esbuildInitialized === false) {
-    if (Deno.run === undefined) {
-      esbuildInitialized = esbuild.initialize({
-        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
-        worker: false,
-      });
-    } else {
-      esbuild.initialize({});
-    }
-    await esbuildInitialized;
-    esbuildInitialized = true;
-  } else if (esbuildInitialized instanceof Promise) {
-    await esbuildInitialized;
-  }
-}
-
-export async function buildClient(config: RemixConfig) {
-  await ensureEsbuildInitialized();
-
+async function buildClient(config: RemixConfig) {
   const routeExports = await getRouteExports(config);
 
   const entryPoints: esbuildTypes.BuildOptions["entryPoints"] = {
@@ -202,6 +202,7 @@ async function getRouteExports(config: RemixConfig) {
       path.resolve(config.appDirectory, route.file)
     ),
     target: "esnext",
+    format: "esm",
     bundle: false,
     metafile: true,
     write: false,
