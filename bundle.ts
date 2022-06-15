@@ -1,6 +1,6 @@
 import { esbuild, path } from "./deps.ts";
 import type { esbuildTypes } from "./deps.ts";
-import { cache as esbuildCache } from "./cache.ts";
+import { denoPlugin } from "./deno-plugin.ts";
 import type { RemixConfig } from "./config.ts";
 
 export async function doBuild(config: RemixConfig) {
@@ -63,7 +63,7 @@ export async function buildClient(config: RemixConfig) {
   const buildResult = await esbuild.build({
     absWorkingDir: config.rootDirectory,
     entryPoints,
-    outdir: ".",
+    outdir: config.assetsBuildDirectory,
     platform: "browser",
     format: "esm",
     metafile: true,
@@ -81,36 +81,9 @@ export async function buildClient(config: RemixConfig) {
       "process.env.REMIX_DEV_SERVER_WS_PORT": "null",
     },
     plugins: [
-      {
-        name: "empty-modules",
-        setup(build) {
-          build.onResolve({ filter: /@remix-run\/server-runtime/ }, (args) => {
-            return { path: args.path, namespace: "empty-module" };
-          });
-          build.onResolve({ filter: /@remix-run\/deno/ }, (args) => {
-            return { path: args.path, namespace: "empty-module" };
-          });
-          build.onResolve({ filter: /deno\.land/ }, (args) => {
-            return { path: args.path, namespace: "empty-module" };
-          });
-
-          build.onLoad({ filter: /.*/, namespace: "empty-module" }, () => {
-            return {
-              // Use an empty CommonJS module here instead of ESM to avoid "No
-              // matching export" errors in esbuild for stuff that is imported
-              // from this file.
-              contents: "module.exports = {};",
-              loader: "js",
-            };
-          });
-        },
-      },
       browserRouteModulesPlugin(config, routeExports, /\?browser$/),
-      esbuildCache({
-        importmap: JSON.parse(
-          Deno.readTextFileSync(path.toFileUrl(config.clientImportMap))
-        ),
-        directory: path.resolve(config.rootDirectory, ".cache"),
+      denoPlugin({
+        importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
       }),
       {
         name: "deno-read-file",
@@ -232,7 +205,7 @@ async function getRouteExports(config: RemixConfig) {
     bundle: false,
     metafile: true,
     write: false,
-    outdir: ".",
+    outdir: config.assetsBuildDirectory,
     plugins: [
       {
         name: "deno-read-file",
@@ -333,7 +306,10 @@ async function createAssetsManifest(
     if (!output.entryPoint) continue;
 
     const entryPointFile = path.resolve(
-      output.entryPoint.replace(/(^browser-route-module:|\?browser$)/g, "")
+      output.entryPoint.replace(
+        /(^deno:file:|^browser-route-module:|\?browser$)/g,
+        ""
+      )
     );
     if (entryPointFile === entryClientFile) {
       entry = {
