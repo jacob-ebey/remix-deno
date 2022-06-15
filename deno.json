@@ -2,7 +2,7 @@
   "importMap": "import_map.server.json",
   "tasks": {
     "dev": "deno run -A --no-check --watch=app/ --import-map=import_map.server.dev.json ./dev.ts",
-    "start": "deno run -A --import-map=import_map.server.json ./dev.ts"
+    "start": "deno run -A --import-map=import_map.server.json ./prod.ts"
   },
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]

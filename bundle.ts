@@ -3,6 +3,29 @@ import type { esbuildTypes } from "./deps.ts";
 import { cache as esbuildCache } from "./cache.ts";
 import type { RemixConfig } from "./config.ts";
 
+export async function doBuild(config: RemixConfig) {
+  const {
+    buildResult,
+    assetsManifest: { url: assetsManifestUrl, ...assetsManifest },
+  } = await buildClient(config);
+
+  const staticAssets = new Map(
+    buildResult.outputFiles.map((file) => [
+      config.publicPath +
+        path
+          .relative(config.assetsBuildDirectory, file.path)
+          .replaceAll(path.SEP, "/"),
+      file.text,
+    ])
+  );
+  staticAssets.set(
+    assetsManifestUrl,
+    `window.__remixManifest=${JSON.stringify(assetsManifest)};`
+  );
+
+  return { assetsManifest, staticAssets };
+}
+
 let esbuildInitialized: boolean | Promise<void> = false;
 async function ensureEsbuildInitialized() {
   if (esbuildInitialized === false) {

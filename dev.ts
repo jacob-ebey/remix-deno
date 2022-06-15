@@ -1,10 +1,51 @@
 import { createRequestHandler } from "remix/server";
 
-import { buildClient } from "./bundle.ts";
+import { doBuild } from "./bundle.ts";
 import { loadConfig } from "./config.ts";
-import { mediaTypeLookup, path, server } from "./deps.ts";
+import { path } from "./deps.ts";
+import { serve } from "./serve.ts";
 
 const config = await loadConfig({ mode: "development" });
+
+const { assetsManifest, staticAssets } = await doBuild(config);
+
+const routeEntries = Object.values(config.routes);
+await Deno.writeTextFile(
+  path.resolve(config.rootDirectory, "remix.gen.ts"),
+  `import * as entryModule from ${JSON.stringify(
+    "./" + path.relative(config.rootDirectory, config.entryServerFile)
+  )};
+${routeEntries
+  .map(
+    (routeConfig, index) =>
+      `import * as route${index} from ${JSON.stringify(
+        "./" +
+          path.relative(
+            config.rootDirectory,
+            path.resolve(config.appDirectory, routeConfig.file)
+          )
+      )}`
+  )
+  .join("\n")}
+export const entry = { module: entryModule };
+export const routes = {
+  ${routeEntries
+    .map((routeConfig, index) =>
+      `
+  [${JSON.stringify(routeConfig.id)}]: {
+    caseSensitive: ${JSON.stringify(routeConfig.caseSensitive)},
+    id: ${JSON.stringify(routeConfig.id)},
+    index: ${JSON.stringify(routeConfig.index)},
+    parentId: ${JSON.stringify(routeConfig.parentId)},
+    path: ${JSON.stringify(routeConfig.path)},
+    module: route${index},
+  }
+    `.trim()
+    )
+    .join(",\n  ")}
+};
+`
+);
 
 const routeModules = Object.fromEntries(
   await Promise.all(
@@ -13,25 +54,6 @@ const routeModules = Object.fromEntries(
       await import(path.resolve(config.appDirectory, route.file)),
     ])
   )
-);
-
-const {
-  buildResult,
-  assetsManifest: { url: assetsManifestUrl, ...assetsManifest },
-} = await buildClient(config);
-
-const staticAssets = new Map(
-  buildResult.outputFiles.map((file) => [
-    config.publicPath +
-      path
-        .relative(config.assetsBuildDirectory, file.path)
-        .replaceAll(path.SEP, "/"),
-    file.text,
-  ])
-);
-staticAssets.set(
-  assetsManifestUrl,
-  `window.__remixManifest=${JSON.stringify(assetsManifest)};`
 );
 
 const remixRequestHandler = createRequestHandler({
@@ -63,25 +85,4 @@ const remixRequestHandler = createRequestHandler({
   },
 });
 
-async function requestHandler(
-  request: Request
-  // connectionInfo: server.ConnInfo
-) {
-  const url = new URL(request.url);
-  const staticAsset = staticAssets.get(url.pathname);
-  if (staticAsset) {
-    const headers = new Headers();
-    const contentType = mediaTypeLookup(url.pathname);
-    contentType && headers.set("Content-Type", contentType);
-    return new Response(staticAsset, { headers });
-  }
-
-  try {
-    return await remixRequestHandler(request);
-  } catch (error) {
-    return new Response(String(error), { status: 500 });
-  }
-}
-
-console.log("Starting server at http://localhost:3000");
-await server.serve(requestHandler, { port: 3000 });
+await serve({ staticAssets, remixRequestHandler });
