@@ -83,7 +83,22 @@ async function buildClient(config: RemixConfig) {
       browserRouteModulesPlugin(config, routeExports, /\?browser$/),
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
+        loader: "portable",
       }),
+      {
+        name: "deno-deploy-file-system",
+        setup(build) {
+          build.onLoad({ filter: /.*$/ }, async (args) => {
+            console.log("HERE!!!");
+            let contents = await Deno.readTextFile(args.path);
+            return {
+              contents,
+              resolveDir: path.dirname(args.path),
+              loader: "tsx",
+            };
+          });
+        },
+      },
     ],
     write: false,
   });
