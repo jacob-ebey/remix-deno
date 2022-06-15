@@ -8,7 +8,7 @@ async function ensureEsbuildInitialized() {
   if (esbuildInitialized === false) {
     if (Deno.run === undefined) {
       esbuildInitialized = esbuild.initialize({
-        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.43/esbuild.wasm",
+        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
         worker: false,
       });
     } else {
@@ -59,7 +59,7 @@ async function buildClient(config: RemixConfig) {
     entryPoints[id] =
       (await Deno.realPath(
         path.join(config.appDirectory, config.routes[id].file)
-      )) + ".browser-route";
+      )) + "?browser";
   }
 
   const buildResult = await esbuild.build({
@@ -83,23 +83,10 @@ async function buildClient(config: RemixConfig) {
       "process.env.REMIX_DEV_SERVER_WS_PORT": "null",
     },
     plugins: [
-      browserRouteModulesPlugin(config, routeExports, /\.browser-route$/),
+      browserRouteModulesPlugin(config, routeExports, /\?browser$/),
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
       }),
-      // {
-      //   name: "deno-read-file",
-      //   setup(build) {
-      //     build.onLoad({ filter: /.*/ }, async (args) => {
-      //       const ext = args.path.split(".").pop() as esbuildTypes.Loader;
-      //       const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
-      //       return {
-      //         contents: await Deno.readTextFile(args.path),
-      //         loader,
-      //       };
-      //     });
-      //   },
-      // },
     ],
     write: false,
   });
@@ -238,19 +225,6 @@ async function getRouteExports(config: RemixConfig) {
           });
         },
       },
-      // {
-      //   name: "deno-read-file",
-      //   setup(build) {
-      //     build.onLoad({ filter: /.*/ }, async (args) => {
-      //       const ext = args.path.split(".").pop() as esbuildTypes.Loader;
-      //       const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
-      //       return {
-      //         contents: await Deno.readTextFile(args.path),
-      //         loader,
-      //       };
-      //     });
-      //   },
-      // },
     ],
   });
 
@@ -337,7 +311,7 @@ async function createAssetsManifest(
     if (!output.entryPoint) continue;
 
     const entryPointFile = output.entryPoint.replace(
-      /(^deno:file:\/\/|^browser-route-module:|\.browser-route$)/g,
+      /(^deno:file:\/\/|^browser-route-module:|\?browser$)/g,
       ""
     );
     if (entryPointFile === entryClientFile) {

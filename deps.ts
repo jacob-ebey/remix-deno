@@ -8,8 +8,8 @@ export { lookup as mediaTypeLookup } from "https://deno.land/x/media_types@v2.10
 
 // -- esbuild --
 // @deno-types="https://deno.land/x/esbuild@v0.14.39/mod.d.ts"
-import * as esbuildWasm from "https://unpkg.com/esbuild-wasm@0.14.43/esm/browser.js";
-import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.43/mod.js";
+import * as esbuildWasm from "https://unpkg.com/esbuild-wasm@0.14.39/esm/browser.js";
+import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.39/mod.js";
 // @ts-ignore trust me
 const esbuild: typeof esbuildWasm =
   Deno.run === undefined ? esbuildWasm : esbuildNative;
