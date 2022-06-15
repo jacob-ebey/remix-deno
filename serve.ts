@@ -13,7 +13,7 @@ export async function serve({
   ) {
     const url = new URL(request.url);
     const staticAsset = staticAssets.get(url.pathname);
-    if (staticAsset) {
+    if (typeof staticAsset !== "undefined") {
       const headers = new Headers();
       const contentType = mediaTypeLookup(url.pathname);
       contentType && headers.set("Content-Type", contentType);
@@ -27,6 +27,6 @@ export async function serve({
     }
   }
 
-  console.log("Starting server at http://localhost:3000");
-  await server.serve(requestHandler, { port: 3000 });
+  console.log("Starting server at http://localhost:8000");
+  await server.serve(requestHandler, { port: 8000 });
 }
