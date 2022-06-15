@@ -87,19 +87,19 @@ async function buildClient(config: RemixConfig) {
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
       }),
-      {
-        name: "deno-read-file",
-        setup(build) {
-          build.onLoad({ filter: /.*/ }, async (args) => {
-            const ext = args.path.split(".").pop() as esbuildTypes.Loader;
-            const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
-            return {
-              contents: await Deno.readTextFile(args.path),
-              loader,
-            };
-          });
-        },
-      },
+      // {
+      //   name: "deno-read-file",
+      //   setup(build) {
+      //     build.onLoad({ filter: /.*/ }, async (args) => {
+      //       const ext = args.path.split(".").pop() as esbuildTypes.Loader;
+      //       const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
+      //       return {
+      //         contents: await Deno.readTextFile(args.path),
+      //         loader,
+      //       };
+      //     });
+      //   },
+      // },
     ],
     write: false,
   });
@@ -238,19 +238,19 @@ async function getRouteExports(config: RemixConfig) {
           });
         },
       },
-      {
-        name: "deno-read-file",
-        setup(build) {
-          build.onLoad({ filter: /.*/ }, async (args) => {
-            const ext = args.path.split(".").pop() as esbuildTypes.Loader;
-            const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
-            return {
-              contents: await Deno.readTextFile(args.path),
-              loader,
-            };
-          });
-        },
-      },
+      // {
+      //   name: "deno-read-file",
+      //   setup(build) {
+      //     build.onLoad({ filter: /.*/ }, async (args) => {
+      //       const ext = args.path.split(".").pop() as esbuildTypes.Loader;
+      //       const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
+      //       return {
+      //         contents: await Deno.readTextFile(args.path),
+      //         loader,
+      //       };
+      //     });
+      //   },
+      // },
     ],
   });
 
