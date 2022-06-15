@@ -1,5 +1,5 @@
 import { path, remixDefineRoutes } from "./deps.ts";
-import { flatRoutes as remixFlatRoutes } from "./flat-routes.ts"
+import { flatRoutes as remixFlatRoutes } from "./flat-routes.ts";
 
 const ENTRY_EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
 
@@ -46,10 +46,10 @@ export async function loadConfig({
   if (!rootRouteFile) {
     throw new Error("No root route file found");
   }
-  const routes: ReturnType<typeof remixDefineRoutes> = await remixFlatRoutes(
+  const routes: ReturnType<typeof remixDefineRoutes> = (await remixFlatRoutes(
     "routes",
     remixDefineRoutes
-  );
+  )) as any;
   routes.root = {
     path: "",
     id: "root",
