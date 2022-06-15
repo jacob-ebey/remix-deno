@@ -26,5 +26,4 @@ try {
   await serve({ staticAssets, remixRequestHandler });
 } catch (error) {
   console.error(error);
-  Deno.exit(1);
 }

@@ -27,6 +27,6 @@ export async function serve({
     }
   }
 
-  console.log("Starting server at http://localhost:8000");
+  console.log(`Starting server at http://localhost:8000`);
   await server.serve(requestHandler, { port: 8000 });
 }
