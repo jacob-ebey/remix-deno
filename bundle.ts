@@ -181,12 +181,14 @@ function browserRouteModulesPlugin(
           let contents = "module.exports = {};";
           if (theExports.length !== 0) {
             const spec = `{ ${theExports.join(", ")} }`;
-            contents = `export ${spec} from ${JSON.stringify(file)};`;
+            contents = `export ${spec} from ${JSON.stringify(
+              "./" + path.basename(file)
+            )};`;
           }
 
           return {
             contents,
-            // resolveDir: path.dirname(file),
+            resolveDir: path.dirname(file),
             loader: "js",
           };
         }
