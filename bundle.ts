@@ -219,7 +219,7 @@ async function getRouteExports(config: RemixConfig) {
     bundle: false,
     metafile: true,
     write: false,
-    outdir: Deno.makeTempDirSync(),
+    outdir: config.assetsBuildDirectory,
   });
 
   if (esbuildResult.errors?.length > 0) {
