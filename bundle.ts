@@ -57,7 +57,9 @@ async function buildClient(config: RemixConfig) {
     // browserEntryPointsPlugin. This allows us to tree-shake server-only code
     // that we don't want to run in the browser (i.e. action & loader).
     entryPoints[id] =
-      path.join(config.appDirectory, config.routes[id].file) + "?browser";
+      (await Deno.realPath(
+        path.join(config.appDirectory, config.routes[id].file)
+      )) + "?browser";
   }
 
   const buildResult = await esbuild.build({
@@ -135,14 +137,15 @@ function browserRouteModulesPlugin(
 ): esbuildTypes.Plugin {
   return {
     name: "browser-route-modules",
-    setup(build) {
-      const routesByFile: Map<string, Route> = Object.keys(
-        config.routes
-      ).reduce((map, key) => {
+    async setup(build) {
+      const routesByFile: Map<string, Route> = new Map();
+      for (const key in routeExports) {
         const route = config.routes[key];
-        map.set(path.join(config.appDirectory, route.file), route);
-        return map;
-      }, new Map());
+        routesByFile.set(
+          await Deno.realPath(path.join(config.appDirectory, route.file)),
+          route
+        );
+      }
 
       build.onResolve({ filter: suffixMatcher }, (args) => {
         return {
@@ -198,11 +201,19 @@ function browserRouteModulesPlugin(
 }
 
 async function getRouteExports(config: RemixConfig) {
+  const entryPointsSet = new Set();
+  const entryPoints: string[] = [];
+  for (const route of Object.values(config.routes)) {
+    const entry = await Deno.realPath(
+      path.join(config.appDirectory, route.file)
+    );
+    entryPointsSet.add(entry);
+    entryPoints.push(entry);
+  }
+
   const esbuildResult = await esbuild.build({
     sourceRoot: config.appDirectory,
-    entryPoints: Object.values(config.routes).map((route) =>
-      path.join(config.appDirectory, route.file)
-    ),
+    entryPoints,
     target: "esnext",
     format: "esm",
     bundle: false,
@@ -210,6 +221,23 @@ async function getRouteExports(config: RemixConfig) {
     write: false,
     outdir: config.assetsBuildDirectory,
     plugins: [
+      {
+        name: "all-externals",
+        setup(build) {
+          build.onResolve({ filter: /.*/ }, (args) => {
+            if (entryPointsSet.has(args.path)) {
+              return undefined;
+            }
+
+            return {
+              path: args.path,
+              namespace: "all-externals",
+              external: true,
+              sideEffects: false,
+            };
+          });
+        },
+      },
       {
         name: "deno-read-file",
         setup(build) {
@@ -292,14 +320,14 @@ async function createAssetsManifest(
   }
 
   const entryClientFile = config.entryClientFile;
-  const routesByFile: Map<string, Route> = Object.keys(config.routes).reduce(
-    (map, key) => {
-      const route = config.routes[key];
-      map.set(path.join(config.appDirectory, route.file), route);
-      return map;
-    },
-    new Map()
-  );
+  const routesByFile: Map<string, Route> = new Map();
+  for (const key in config.routes) {
+    const route = config.routes[key];
+    routesByFile.set(
+      await Deno.realPath(path.join(config.appDirectory, route.file)),
+      route
+    );
+  }
 
   let entry: any; //AssetsManifest["entry"] | undefined;
   const routes: any = {}; //AssetsManifest["routes"] = {};
@@ -308,7 +336,6 @@ async function createAssetsManifest(
     const output = metafile.outputs[key];
     if (!output.entryPoint) continue;
 
-    console.log(output.entryPoint);
     const entryPointFile = output.entryPoint.replace(
       /(^deno:file:\/\/|^browser-route-module:|\?browser$)/g,
       ""

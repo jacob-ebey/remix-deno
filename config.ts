@@ -22,9 +22,8 @@ export async function loadConfig({
 }): Promise<RemixConfig> {
   mode = mode === "development" ? "development" : "production";
   const rootDirectory = Deno.cwd();
-  const appDirectory = path.join(rootDirectory, "app");
+  const appDirectory = await Deno.realPath(path.join(rootDirectory, "app"));
   const assetsBuildDirectory = path.join(rootDirectory, "public/build");
-
   const entryClientFile = await findFile(
     appDirectory,
     "entry.client",
@@ -84,7 +83,7 @@ export async function findFile(
   extensions: string[]
 ) {
   for (const extension of extensions) {
-    const filePath = path.join(searchDir, baseName + extension);
+    const filePath = await path.join(searchDir, baseName + extension);
     if (
       await Deno.stat(filePath)
         .then((s) => s.isFile)

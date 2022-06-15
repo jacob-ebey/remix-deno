@@ -50,16 +50,16 @@ function isPathSeparator(char: string) {
 
 const visitFiles: VisitFilesFunction = async (
   dir: string,
-  visitor: (file: string) => void,
+  visitor: (file: string) => Promise<void>,
   baseDir = dir
 ) => {
   for await (const dirEntry of Deno.readDir(dir)) {
-    const file = path.join(dir, dirEntry.name);
+    const file = await Deno.realPath(path.join(dir, dirEntry.name));
 
     if (dirEntry.isDirectory) {
       await visitFiles(file, visitor, baseDir);
     } else if (dirEntry.isFile) {
-      visitor(path.relative(baseDir, file));
+      await visitor(path.relative(baseDir, file));
     }
   }
 };
@@ -94,7 +94,7 @@ type DefineRouteFunction = (
 
 export type VisitFilesFunction = (
   dir: string,
-  visitor: (file: string) => void,
+  visitor: (file: string) => Promise<void>,
   baseDir?: string
 ) => Promise<void>;
 
@@ -129,8 +129,8 @@ export default async function flatRoutes(
     parentId: "",
     index: false,
   });
-  await visitor(`app/${baseDir}`, (routeFile: string) => {
-    const routeInfo = getRouteInfo(baseDir, routeFile, options.basePath);
+  await visitor(`app/${baseDir}`, async (routeFile: string) => {
+    const routeInfo = await getRouteInfo(baseDir, routeFile, options.basePath);
     if (!routeInfo) return;
     routeMap.set(routeInfo.name, routeInfo);
   });
@@ -165,7 +165,7 @@ function getParentRoute(
   routeMap: Map<string, RouteInfo>,
   name: string
 ): string | null {
-  var parentName = name.substring(0, name.lastIndexOf("."));
+  const parentName = name.substring(0, name.lastIndexOf("."));
   if (parentName === "") {
     return "root";
   }
@@ -204,11 +204,11 @@ function getRoutes(
   }
 }
 
-export function getRouteInfo(
+export async function getRouteInfo(
   baseDir: string,
   routeFile: string,
   basePath?: string
-): RouteInfo | null {
+): Promise<RouteInfo | null> {
   let url = basePath ?? "";
   // get extension
   const ext = path.extname(routeFile);

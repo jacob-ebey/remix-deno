@@ -11,7 +11,7 @@ const { assetsManifest, staticAssets } = await doBuild(config);
 
 const routeEntries = Object.values(config.routes);
 await Deno.writeTextFile(
-  path.join(config.rootDirectory, "remix.gen.ts"),
+  await Deno.realPath(path.join(config.rootDirectory, "remix.gen.ts")),
   `import * as entryModule from ${JSON.stringify(
     "./" + path.relative(config.rootDirectory, config.entryServerFile)
   )};
@@ -51,7 +51,9 @@ const routeModules = Object.fromEntries(
   await Promise.all(
     Object.entries(config.routes).map(async ([routeId, route]) => [
       routeId,
-      await import(path.join(config.appDirectory, route.file)),
+      await import(
+        await Deno.realPath(path.join(config.appDirectory, route.file))
+      ),
     ])
   )
 );
