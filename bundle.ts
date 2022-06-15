@@ -57,7 +57,7 @@ async function buildClient(config: RemixConfig) {
     // browserEntryPointsPlugin. This allows us to tree-shake server-only code
     // that we don't want to run in the browser (i.e. action & loader).
     entryPoints[id] =
-      path.resolve(config.appDirectory, config.routes[id].file) + "?browser";
+      path.join(config.appDirectory, config.routes[id].file) + "?browser";
   }
 
   const buildResult = await esbuild.build({
@@ -140,7 +140,7 @@ function browserRouteModulesPlugin(
         config.routes
       ).reduce((map, key) => {
         const route = config.routes[key];
-        map.set(path.resolve(config.appDirectory, route.file), route);
+        map.set(path.join(config.appDirectory, route.file), route);
         return map;
       }, new Map());
 
@@ -201,7 +201,7 @@ async function getRouteExports(config: RemixConfig) {
   const esbuildResult = await esbuild.build({
     sourceRoot: config.appDirectory,
     entryPoints: Object.values(config.routes).map((route) =>
-      path.resolve(config.appDirectory, route.file)
+      path.join(config.appDirectory, route.file)
     ),
     target: "esnext",
     format: "esm",
@@ -279,7 +279,7 @@ async function createAssetsManifest(
   function resolveUrl(outputPath: string): string {
     return createUrl(
       config.publicPath,
-      path.relative(config.assetsBuildDirectory, path.resolve(outputPath))
+      path.relative(config.assetsBuildDirectory, outputPath)
     );
   }
 
@@ -295,7 +295,7 @@ async function createAssetsManifest(
   const routesByFile: Map<string, Route> = Object.keys(config.routes).reduce(
     (map, key) => {
       const route = config.routes[key];
-      map.set(path.resolve(config.appDirectory, route.file), route);
+      map.set(path.join(config.appDirectory, route.file), route);
       return map;
     },
     new Map()
@@ -308,11 +308,10 @@ async function createAssetsManifest(
     const output = metafile.outputs[key];
     if (!output.entryPoint) continue;
 
-    const entryPointFile = path.resolve(
-      output.entryPoint.replace(
-        /(^deno:file:|^browser-route-module:|\?browser$)/g,
-        ""
-      )
+    console.log(output.entryPoint);
+    const entryPointFile = output.entryPoint.replace(
+      /(^deno:file:\/\/|^browser-route-module:|\?browser$)/g,
+      ""
     );
     if (entryPointFile === entryClientFile) {
       entry = {

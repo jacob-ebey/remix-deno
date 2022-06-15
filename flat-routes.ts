@@ -1,7 +1,7 @@
 import { path } from "./deps.ts";
 
 function getRouteSegments(name: string) {
-  let routeSegments: string[] = [];
+  const routeSegments: string[] = [];
   let index = 0;
   let routeSegment = "";
   let state = "START";
@@ -14,7 +14,7 @@ function getRouteSegments(name: string) {
   };
 
   while (index < name.length) {
-    let char = name[index];
+    const char = name[index];
     switch (state) {
       case "START":
         // process existing segment
@@ -53,8 +53,8 @@ const visitFiles: VisitFilesFunction = async (
   visitor: (file: string) => void,
   baseDir = dir
 ) => {
-  for await (let dirEntry of Deno.readDir(dir)) {
-    let file = path.resolve(dir, dirEntry.name);
+  for await (const dirEntry of Deno.readDir(dir)) {
+    const file = path.join(dir, dirEntry.name);
 
     if (dirEntry.isDirectory) {
       await visitFiles(file, visitor, baseDir);
@@ -134,11 +134,11 @@ export default async function flatRoutes(
     if (!routeInfo) return;
     routeMap.set(routeInfo.name, routeInfo);
   });
-  let routes = defineRoutes((route) => {
+  const routes = defineRoutes((route) => {
     // setup parent map
-    for (let [name, route] of routeMap) {
+    for (const [name, route] of routeMap) {
       if (name === "root") continue;
-      let parentRoute = getParentRoute(routeMap, name);
+      const parentRoute = getParentRoute(routeMap, name);
       if (parentRoute) {
         let parent = parentMap.get(parentRoute);
         if (!parent) {
@@ -180,14 +180,14 @@ function getRoutes(
   parent: string,
   route: DefineRouteFunction
 ) {
-  let parentRoute = parentMap.get(parent);
+  const parentRoute = parentMap.get(parent);
   if (parentRoute && parentRoute.children) {
     const routeOptions: DefineRouteOptions = {
       caseSensitive: false,
       index: parentRoute!.routeInfo.index,
     };
     const routeChildren: DefineRouteChildren = () => {
-      for (let child of parentRoute!.children) {
+      for (const child of parentRoute!.children) {
         getRoutes(parentMap, child.name, route);
         const path = child.path.substring(
           parentRoute!.routeInfo.path.length + 1
@@ -211,7 +211,7 @@ export function getRouteInfo(
 ): RouteInfo | null {
   let url = basePath ?? "";
   // get extension
-  let ext = path.extname(routeFile);
+  const ext = path.extname(routeFile);
   // only process valid route files
   if (![".js", ".jsx", ".ts", ".tsx", ".md", ".mdx"].includes(ext)) {
     return null;
@@ -237,9 +237,9 @@ export function getRouteInfo(
     name = path.dirname(name);
   }
 
-  let routeSegments = getRouteSegments(name);
+  const routeSegments = getRouteSegments(name);
   for (let i = 0; i < routeSegments.length; i++) {
-    let routeSegment = routeSegments[i];
+    const routeSegment = routeSegments[i];
     url = appendPathSegment(url, routeSegment);
   }
   return {

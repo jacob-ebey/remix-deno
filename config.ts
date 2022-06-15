@@ -84,7 +84,7 @@ export async function findFile(
   extensions: string[]
 ) {
   for (const extension of extensions) {
-    const filePath = path.resolve(searchDir, baseName + extension);
+    const filePath = path.join(searchDir, baseName + extension);
     if (
       await Deno.stat(filePath)
         .then((s) => s.isFile)
