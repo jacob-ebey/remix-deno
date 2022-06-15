@@ -65,6 +65,7 @@ async function buildClient(config: RemixConfig) {
     outdir: config.assetsBuildDirectory,
     platform: "browser",
     format: "esm",
+    write: false,
     metafile: true,
     bundle: true,
     splitting: true,
@@ -100,7 +101,6 @@ async function buildClient(config: RemixConfig) {
         },
       },
     ],
-    write: false,
   });
 
   return {
@@ -136,7 +136,7 @@ function browserRouteModulesPlugin(
 ): esbuildTypes.Plugin {
   return {
     name: "browser-route-modules",
-    async setup(build) {
+    setup(build) {
       const routesByFile: Map<string, Route> = new Map();
       for (const key in routeExports) {
         const route = config.routes[key];
@@ -180,14 +180,16 @@ function browserRouteModulesPlugin(
           let contents = "module.exports = {};";
           if (theExports.length !== 0) {
             const spec = `{ ${theExports.join(", ")} }`;
+            console.log(file);
             contents = `export ${spec} from ${JSON.stringify(
-              "./" + path.basename(file)
+              file
+              // "./" + path.basename(file)
             )};`;
           }
 
           return {
             contents,
-            resolveDir: path.dirname(file),
+            // resolveDir: path.dirname(file),
             loader: "js",
           };
         }
