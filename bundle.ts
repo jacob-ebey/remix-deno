@@ -112,6 +112,19 @@ export async function buildClient(config: RemixConfig) {
         ),
         directory: path.resolve(config.rootDirectory, ".cache"),
       }),
+      {
+        name: "deno-read-file",
+        setup(build) {
+          build.onLoad({ filter: /.*/ }, async (args) => {
+            const ext = args.path.split(".").pop() as esbuildTypes.Loader;
+            const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
+            return {
+              contents: await Deno.readTextFile(args.path),
+              loader,
+            };
+          });
+        },
+      },
     ],
     write: false,
   });
