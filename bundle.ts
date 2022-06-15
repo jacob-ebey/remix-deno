@@ -63,7 +63,7 @@ export async function buildClient(config: RemixConfig) {
   const buildResult = await esbuild.build({
     absWorkingDir: config.rootDirectory,
     entryPoints,
-    outdir: config.assetsBuildDirectory,
+    outdir: ".",
     platform: "browser",
     format: "esm",
     metafile: true,
@@ -232,7 +232,22 @@ async function getRouteExports(config: RemixConfig) {
     bundle: false,
     metafile: true,
     write: false,
-    outdir: config.assetsBuildDirectory,
+    outdir: ".",
+    plugins: [
+      {
+        name: "deno-read-file",
+        setup(build) {
+          build.onLoad({ filter: /.*/ }, async (args) => {
+            const ext = args.path.split(".").pop() as esbuildTypes.Loader;
+            const loader = ext?.match(/"j|tsx?$/) ? ext : "ts";
+            return {
+              contents: await Deno.readTextFile(args.path),
+              loader,
+            };
+          });
+        },
+      },
+    ],
   });
 
   if (esbuildResult.errors?.length > 0) {
