@@ -8,6 +8,9 @@ import * as build from "./remix.gen.ts";
 
 try {
   const config = await loadConfig({ mode: "production" });
+  for await (const item of await Deno.readDir(config.appDirectory)) {
+    console.log(item);
+  }
 
   const { assetsManifest, staticAssets } = await doBuild(config);
 
