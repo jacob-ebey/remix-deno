@@ -59,7 +59,7 @@ async function buildClient(config: RemixConfig) {
     entryPoints[id] =
       (await Deno.realPath(
         path.join(config.appDirectory, config.routes[id].file)
-      )) + "?browser";
+      )) + ".browser-route";
   }
 
   const buildResult = await esbuild.build({
@@ -83,7 +83,7 @@ async function buildClient(config: RemixConfig) {
       "process.env.REMIX_DEV_SERVER_WS_PORT": "null",
     },
     plugins: [
-      browserRouteModulesPlugin(config, routeExports, /\?browser$/),
+      browserRouteModulesPlugin(config, routeExports, /\.browser-route$/),
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
       }),
@@ -337,7 +337,7 @@ async function createAssetsManifest(
     if (!output.entryPoint) continue;
 
     const entryPointFile = output.entryPoint.replace(
-      /(^deno:file:\/\/|^browser-route-module:|\?browser$)/g,
+      /(^deno:file:\/\/|^browser-route-module:|\.browser-route$)/g,
       ""
     );
     if (entryPointFile === entryClientFile) {
