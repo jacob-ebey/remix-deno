@@ -28,6 +28,7 @@ export default async function handleDocumentRequest(
 
   const headers = new Headers(responseHeaders);
   headers.set("Content-Type", "text/html");
+  headers.set("Content-Encoding", "chunked");
 
   return new Response(body, {
     headers,
