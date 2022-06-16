@@ -11,7 +11,7 @@ export async function serveDev() {
 
   const routeEntries = Object.values(config.routes);
   await Deno.writeTextFile(
-    await Deno.realPath(path.join(config.rootDirectory, "remix.gen.ts")),
+    path.join(config.rootDirectory, "remix.gen.ts"),
     `import * as entryModule from ${JSON.stringify(
       "./" + path.relative(config.rootDirectory, config.entryServerFile)
     )};

@@ -22,7 +22,7 @@ export async function loadConfig({
 }): Promise<RemixConfig> {
   mode = mode === "development" ? "development" : "production";
   const rootDirectory = Deno.cwd();
-  const appDirectory = await Deno.realPath(path.join(rootDirectory, "app"));
+  const appDirectory = path.join(rootDirectory, "app");
   const assetsBuildDirectory = path.join(rootDirectory, "public/build");
   const entryClientFile = await findFile(
     appDirectory,
