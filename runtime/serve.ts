@@ -1,4 +1,4 @@
-import { brotliCompress, mediaTypeLookup, server } from "../deps.ts";
+import { mediaTypeLookup, server } from "../deps.ts";
 
 export async function serve({
   staticAssets,
@@ -12,7 +12,7 @@ export async function serve({
     if (typeof asset === "string") {
       asset = encoder.encode(asset);
     }
-    staticAssets.set(key, brotliCompress(asset));
+    staticAssets.set(key, asset);
   }
   async function requestHandler(
     request: Request
@@ -24,7 +24,6 @@ export async function serve({
       const headers = new Headers();
       const contentType = mediaTypeLookup(url.pathname);
       contentType && headers.set("Content-Type", contentType);
-      headers.set("Content-Encoding", "br");
       return new Response(staticAsset, { headers });
     }
 

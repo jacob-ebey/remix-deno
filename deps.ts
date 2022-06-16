@@ -5,7 +5,6 @@ export * as server from "https://deno.land/std@0.143.0/http/server.ts";
 
 // -- media types --
 export { lookup as mediaTypeLookup } from "https://deno.land/x/media_types@v2.10.2/mod.ts";
-export { compress as brotliCompress } from "https://deno.land/x/brotli@v0.1.4/mod.ts";
 
 // -- esbuild --
 // @deno-types="https://deno.land/x/esbuild@v0.14.39/mod.d.ts"
