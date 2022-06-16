@@ -1,4 +1,4 @@
-import { mediaTypeLookup, server } from "./deps.ts";
+import { mediaTypeLookup, server } from "../deps.ts";
 
 export async function serve({
   staticAssets,

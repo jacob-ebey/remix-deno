@@ -1,5 +1,5 @@
-import { esbuild, path } from "./deps.ts";
-import type { esbuildTypes } from "./deps.ts";
+import type { esbuildTypes } from "../deps.ts";
+import { esbuild, path } from "../deps.ts";
 import { denoPlugin } from "./deno-plugin.ts";
 import type { RemixConfig } from "./config.ts";
 

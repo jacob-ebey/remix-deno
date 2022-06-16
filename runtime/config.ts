@@ -1,4 +1,4 @@
-import { path, remixDefineRoutes } from "./deps.ts";
+import { path, remixDefineRoutes } from "../deps.ts";
 import { flatRoutes as remixFlatRoutes } from "./flat-routes.ts";
 
 const ENTRY_EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];

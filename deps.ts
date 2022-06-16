@@ -19,8 +19,9 @@ export { esbuild, esbuildWasm as esbuildTypes };
 // export { cache as esbuildCache } from "https://esm.sh/esbuild-plugin-cache@0.2.9?pin=v86&target=deno";
 // export * as importMaps from "https://esm.sh/esbuild-plugin-import-map@2.1.0?pin=v86&target=deno";
 
-// -- @remix-run/dev --
+// -- @remix-run/xxx --
 export { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&deps=esbuild@0.14.39&target=deno";
+export { createRequestHandler as createRemixRequestHandler } from "https://esm.sh/@remix-run/deno@1.6.0/index.ts?pin=v86&target=deno&deps=react@18.2.0";
 
 // -- remix-flat-routes --
 // export { default as remixFlatRoutes } from "https://esm.sh/remix-flat-routes@0.4.3?pin=v86&target=deno";

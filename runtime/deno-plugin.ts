@@ -1,4 +1,6 @@
-import { esbuildTypes, path } from "./deps.ts";
+import type { esbuildTypes } from "../deps.ts";
+import { path } from "../deps.ts";
+// TODO: Mange these deps elsewhere
 import {
   ImportMap,
   resolveImportMap,

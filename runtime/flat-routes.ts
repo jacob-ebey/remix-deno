@@ -1,4 +1,4 @@
-import { path } from "./deps.ts";
+import { path } from "../deps.ts";
 
 function getRouteSegments(name: string) {
   const routeSegments: string[] = [];
