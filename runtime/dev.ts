@@ -4,7 +4,7 @@ import { doBuild } from "./bundle.ts";
 import { loadConfig } from "./config.ts";
 import { serve } from "./serve.ts";
 
-export async function serveDev() {
+export async function serveDev(doImport: (mod: string) => Promise<any>) {
   const config = await loadConfig({ mode: "development" });
 
   const { assetsManifest, staticAssets } = await doBuild(config);
@@ -47,8 +47,7 @@ export const routes = {
     await Promise.all(
       Object.entries(config.routes).map(async ([routeId, route]) => [
         routeId,
-        console.log(path.toFileUrl(route.file).href) ||
-          (await import(path.toFileUrl(route.file).href)),
+        await doImport(path.toFileUrl(route.file).href),
       ])
     )
   );
@@ -56,7 +55,7 @@ export const routes = {
   const remixRequestHandler = createRemixRequestHandler({
     build: {
       entry: {
-        module: await import(config.entryServerFile),
+        module: await doImport(config.entryServerFile),
       },
       routes: Object.entries(config.routes).reduce(
         (acc, [routeId, routeConfig]) => {

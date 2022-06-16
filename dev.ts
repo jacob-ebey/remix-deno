@@ -1,3 +1,3 @@
 import { serveDev } from "./mod.ts";
 
-await serveDev();
+await serveDev((mod) => import(mod));
