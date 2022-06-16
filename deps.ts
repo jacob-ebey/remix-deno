@@ -8,7 +8,7 @@ export { lookup as mediaTypeLookup } from "https://deno.land/x/media_types@v2.10
 
 // -- esbuild --
 // @deno-types="https://deno.land/x/esbuild@v0.14.39/mod.d.ts"
-import * as esbuildWasm from "https://unpkg.com/esbuild-wasm@0.14.39/esm/browser.js";
+import esbuildWasm from "https://esm.sh/esbuild-wasm@0.14.39/lib/browser.js?pin=v86&target=deno";
 import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.39/mod.js";
 // @ts-ignore trust me
 const esbuild: typeof esbuildWasm =
@@ -20,7 +20,7 @@ export { esbuild, esbuildWasm as esbuildTypes };
 // export * as importMaps from "https://esm.sh/esbuild-plugin-import-map@2.1.0?pin=v86&target=deno";
 
 // -- @remix-run/dev --
-export { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&target=deno";
+export { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&deps=esbuild@0.14.39&target=deno";
 
 // -- remix-flat-routes --
 // export { default as remixFlatRoutes } from "https://esm.sh/remix-flat-routes@0.4.3?pin=v86&target=deno";

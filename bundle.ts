@@ -8,7 +8,7 @@ async function ensureEsbuildInitialized() {
   if (esbuildInitialized === false) {
     if (Deno.run === undefined) {
       esbuildInitialized = esbuild.initialize({
-        wasmURL: "https://unpkg.com/esbuild-wasm@0.14.39/esbuild.wasm",
+        wasmURL: "https://esm.sh/esbuild-wasm@0.14.39/esbuild.wasm",
         worker: false,
       });
     } else {
@@ -85,20 +85,6 @@ async function buildClient(config: RemixConfig) {
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
       }),
-      {
-        name: "deno-deploy-file-system",
-        setup(build) {
-          build.onLoad({ filter: /.*$/ }, async (args) => {
-            console.log("HERE!!!");
-            let contents = await Deno.readTextFile(args.path);
-            return {
-              contents,
-              resolveDir: path.dirname(args.path),
-              loader: "tsx",
-            };
-          });
-        },
-      },
     ],
   });
 
@@ -179,7 +165,6 @@ function browserRouteModulesPlugin(
           let contents = "module.exports = {};";
           if (theExports.length !== 0) {
             const spec = `{ ${theExports.join(", ")} }`;
-            console.log(file);
             contents = `export ${spec} from ${JSON.stringify(
               file
               // "./" + path.basename(file)
@@ -207,7 +192,7 @@ async function getRouteExports(config: RemixConfig) {
   }
 
   const esbuildResult = await esbuild.build({
-    sourceRoot: config.appDirectory,
+    absWorkingDir: config.rootDirectory,
     entryPoints,
     target: "esnext",
     format: "esm",
@@ -233,6 +218,9 @@ async function getRouteExports(config: RemixConfig) {
           });
         },
       },
+      denoPlugin({
+        importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
+      }),
     ],
   });
 
@@ -247,8 +235,10 @@ async function getRouteExports(config: RemixConfig) {
   const exportsMap = Object.values(esbuildResult.metafile!.outputs).reduce(
     (acc, output) => {
       const entrypoint = output.entryPoint
-        ?.replace(/^app\//, "")
+        ?.replace(/^deno:file:\/\//, "")
+        .replace(config.appDirectory + "/", "")
         .replace(/\.[jt]sx?$/, "");
+
       if (entrypoint) {
         acc[entrypoint] = new Set(output.exports);
       }
