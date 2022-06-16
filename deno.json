@@ -1,7 +1,7 @@
 {
   "importMap": "import_map.server.json",
   "tasks": {
-    "build": "deno run -A ./build.ts",
+    "build": "deno run -A --no-check ./build.ts",
     "dev": "deno run -A --no-check --watch=app/ --import-map=import_map.server.dev.json ./dev.ts",
     "start": "deno run -A --import-map=import_map.server.json ./prod.ts"
   },
