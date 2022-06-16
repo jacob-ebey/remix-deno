@@ -1,4 +1,5 @@
-import React from "react";
+/** @jsx React.createElement */
+import * as React from "react";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "remix/react";
 import type { MetaFunction } from "remix/server";
 
