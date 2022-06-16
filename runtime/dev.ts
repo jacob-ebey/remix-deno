@@ -1,14 +1,11 @@
 import { createRemixRequestHandler, path } from "../deps.ts";
 
 import { doBuild } from "./bundle.ts";
+import type { RemixConfig } from "./config.ts";
 import { loadConfig } from "./config.ts";
 import { serve } from "./serve.ts";
 
-export async function serveDev(doImport: (mod: string) => Promise<any>) {
-  const config = await loadConfig({ mode: "development" });
-
-  const { assetsManifest, staticAssets } = await doBuild(config);
-
+export async function writeRemixGen(config: RemixConfig) {
   const routeEntries = Object.values(config.routes);
   await Deno.writeTextFile(
     path.join(config.rootDirectory, "remix.gen.ts"),
@@ -42,6 +39,13 @@ export const routes = {
 };
 `
   );
+}
+
+export async function serveDev(doImport: (mod: string) => Promise<any>) {
+  const config = await loadConfig({ mode: "development" });
+
+  await writeRemixGen(config);
+  const { assetsManifest, staticAssets } = await doBuild(config);
 
   const routeModules = Object.fromEntries(
     await Promise.all(
