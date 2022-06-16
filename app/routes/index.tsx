@@ -1,3 +1,4 @@
+/** @jsx React.createElement */
 import * as React from "react";
 import { Link, useLoaderData } from "remix/react";
 import type { LoaderFunction } from "remix/server";

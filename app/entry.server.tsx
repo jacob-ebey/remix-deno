@@ -1,3 +1,4 @@
+/** @jsx React.createElement */
 import * as React from "react";
 import * as ReactDOM from "react-dom/server";
 import { RemixServer } from "remix/react";
