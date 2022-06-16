@@ -84,7 +84,6 @@ async function buildClient(config: RemixConfig) {
       browserRouteModulesPlugin(config, routeExports, /\?browser$/),
       denoPlugin({
         importMapURL: new URL(path.toFileUrl(config.clientImportMap)),
-        loader: "portable",
       }),
       {
         name: "deno-deploy-file-system",

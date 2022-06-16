@@ -8,6 +8,6 @@
     "react-dom": "https://esm.sh/react-dom@18.2.0?pin=v86&deps=react@18.2.0",
     "remix/react": "https://esm.sh/@remix-run/react@1.6.0?pin=v86&deps=react@18.2.0",
     "remix/server": "https://esm.sh/@remix-run/deno@1.6.0/index.ts?pin=v86&deps=react@18.2.0",
-    "@remix-run/server-runtime": "./empty.js"
+    "@remix-run/server-runtime": "https://esm.sh/@remix-run/server-runtime@1.6.0?pin=v86&target=deno&deps=react@18.2.0"
   }
 }
