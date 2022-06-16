@@ -5,6 +5,7 @@
     "start": "deno run -A --import-map=import_map.server.json ./prod.ts"
   },
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "jsx": "react"
   }
 }
