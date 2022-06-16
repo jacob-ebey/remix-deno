@@ -47,7 +47,7 @@ export const routes = {
     await Promise.all(
       Object.entries(config.routes).map(async ([routeId, route]) => [
         routeId,
-        await import(route.file),
+        await import(path.toFileUrl(route.file).href),
       ])
     )
   );
