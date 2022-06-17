@@ -1,10 +1,10 @@
-import { createRemixRequestHandler } from "../deps.ts";
+import { createRemixRequestHandler, server } from "../deps.ts";
 
 import { doBuild } from "./bundle.ts";
 import { loadConfig } from "./config.ts";
-import { serve } from "./serve.ts";
+import { createRequestHandler } from "./serve.ts";
 
-export async function serveProd(remixGen: any) {
+async function prepareRequestHandlerOptions(remixGen: any) {
   const config = await loadConfig({ mode: "production" });
 
   const { assetsManifest, staticAssets } = await doBuild(config);
@@ -21,5 +21,14 @@ export async function serveProd(remixGen: any) {
     },
   });
 
-  await serve({ staticAssets, remixRequestHandler });
+  return { staticAssets, remixRequestHandler };
+}
+
+export async function serveProd(remixGen: any) {
+  const requestHandler = createRequestHandler(
+    prepareRequestHandlerOptions(remixGen)
+  );
+
+  const port = Number(Deno.env.get("PORT") || "8000");
+  await server.serve(requestHandler, { port });
 }
