@@ -1,23 +1,29 @@
-import { mediaTypeLookup, server } from "../deps.ts";
+import { mediaTypeLookup } from "../deps.ts";
 
-export async function serve({
-  staticAssets,
-  remixRequestHandler,
-}: {
+interface CreateRequestHandlerOptions {
   staticAssets: Map<string, string | Uint8Array>;
   remixRequestHandler: (request: Request) => Promise<Response>;
-}) {
-  const encoder = new TextEncoder();
-  for (let [key, asset] of staticAssets) {
-    if (typeof asset === "string") {
-      asset = encoder.encode(asset);
+}
+
+export function createRequestHandler(
+  options: CreateRequestHandlerOptions | Promise<CreateRequestHandlerOptions>
+) {
+  const finalOptionsPromise = Promise.resolve(options).then((options) => {
+    const encoder = new TextEncoder();
+    for (let [key, asset] of options.staticAssets) {
+      if (typeof asset === "string") {
+        asset = encoder.encode(asset);
+      }
+      options.staticAssets.set(key, asset);
     }
-    staticAssets.set(key, asset);
-  }
-  async function requestHandler(
+    return options;
+  });
+
+  return async function requestHandler(
     request: Request
     // connectionInfo: server.ConnInfo
   ) {
+    const { staticAssets, remixRequestHandler } = await finalOptionsPromise;
     const url = new URL(request.url);
     const staticAsset = staticAssets.get(url.pathname);
     if (typeof staticAsset !== "undefined") {
@@ -32,8 +38,5 @@ export async function serve({
     } catch (error) {
       return new Response(String(error), { status: 500 });
     }
-  }
-
-  console.log(`Starting server at http://localhost:8000`);
-  await server.serve(requestHandler, { port: 8000 });
+  };
 }

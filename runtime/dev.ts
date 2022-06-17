@@ -1,9 +1,9 @@
-import { createRemixRequestHandler, path } from "../deps.ts";
+import { createRemixRequestHandler, path, server } from "../deps.ts";
 
 import { doBuild } from "./bundle.ts";
 import type { RemixConfig } from "./config.ts";
 import { loadConfig } from "./config.ts";
-import { serve } from "./serve.ts";
+import { createRequestHandler } from "./serve.ts";
 
 export async function writeRemixGen(config: RemixConfig) {
   const routeEntries = Object.values(config.routes);
@@ -41,7 +41,9 @@ export const routes = {
   );
 }
 
-export async function serveDev(doImport: (mod: string) => Promise<any>) {
+async function prepareRequestHandlerOptions(
+  doImport: (mod: string) => Promise<any>
+) {
   const config = await loadConfig({ mode: "development" });
 
   await writeRemixGen(config);
@@ -85,5 +87,14 @@ export async function serveDev(doImport: (mod: string) => Promise<any>) {
     },
   });
 
-  await serve({ staticAssets, remixRequestHandler });
+  return { staticAssets, remixRequestHandler };
+}
+
+export async function serveDev(doImport: (mod: string) => Promise<any>) {
+  const requestHandler = createRequestHandler(
+    prepareRequestHandlerOptions(doImport)
+  );
+
+  const port = Number(Deno.env.get("PORT") || "8000");
+  await server.serve(requestHandler, { port });
 }
