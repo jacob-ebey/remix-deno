@@ -1,4 +1,4 @@
-import { mediaTypeLookup } from "../deps.ts";
+import { mediaTypeLookup} from "../deps.ts";
 
 interface CreateRequestHandlerOptions {
   staticAssets: Map<string, string | Uint8Array>;
@@ -40,3 +40,29 @@ export function createRequestHandler(
     }
   };
 }
+
+// export function createRequestHandler<
+//   Context extends AppLoadContext | undefined = undefined,
+// >({
+//   build,
+//   mode,
+//   getLoadContext,
+// }: {
+//   build: ServerBuild;
+//   mode?: string;
+//   getLoadContext?: (request: Request) => Promise<Context> | Context;
+// }) {
+//   const handleRequest = createRemixRequestHandler(build, mode);
+
+//   return async (request: Request) => {
+//     try {
+//       const loadContext = await getLoadContext?.(request);
+
+//       return handleRequest(request, loadContext);
+//     } catch (error: unknown) {
+//       console.error(error);
+
+//       return new Response("Internal Error", { status: 500 });
+//     }
+//   };
+// }

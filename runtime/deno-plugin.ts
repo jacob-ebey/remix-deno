@@ -6,10 +6,12 @@ import {
   resolveImportMap,
   resolveModuleSpecifier,
   toFileUrl,
-} from "https://deno.land/x/esbuild_deno_loader@0.5.0/deps.ts";
-import { load as nativeLoad } from "https://deno.land/x/esbuild_deno_loader@0.5.0/src/native_loader.ts";
-import { load as portableLoad } from "https://deno.land/x/esbuild_deno_loader@0.5.0/src/portable_loader.ts";
-import { ModuleEntry } from "https://deno.land/x/esbuild_deno_loader@0.5.0/src/deno.ts";
+} from "https://deno.land/x/esbuild_deno_loader@0.6.0/deps.ts";
+import { load as nativeLoad } from "https://deno.land/x/esbuild_deno_loader@0.6.0/src/native_loader.ts";
+// import { load as portableLoad } from "https://deno.land/x/esbuild_deno_loader@0.6.0/src/portable_loader.ts";
+import * as esbuildDenoLoader from "https://deno.land/x/esbuild_deno_loader@0.6.0/src/portable_loader.ts";
+const portableLoad = esbuildDenoLoader.load;
+import { ModuleEntry } from "https://deno.land/x/esbuild_deno_loader@0.6.0/src/deno.ts";
 
 export interface DenoPluginOptions {
   /**

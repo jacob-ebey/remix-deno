@@ -8,7 +8,7 @@ async function ensureEsbuildInitialized() {
   if (esbuildInitialized === false) {
     if (Deno.run === undefined) {
       esbuildInitialized = esbuild.initialize({
-        wasmURL: "https://esm.sh/esbuild-wasm@0.14.39/esbuild.wasm",
+        wasmURL: "https://esm.sh/esbuild-wasm@0.17.15/esbuild.wasm",
         worker: false,
       });
     } else {

@@ -1,15 +1,16 @@
 // -- std libs --
-import * as path from "https://deno.land/std@0.143.0/path/mod.ts";
+import * as path from "https://deno.land/std@0.182.0/path/mod.ts";
 export { path };
-export * as server from "https://deno.land/std@0.143.0/http/server.ts";
+export * as server from "https://deno.land/std@0.182.0/http/server.ts";
 
 // -- media types --
-export { lookup as mediaTypeLookup } from "https://deno.land/x/media_types@v2.10.2/mod.ts";
+import { contentType }from "https://deno.land/std@0.182.0/media_types/mod.ts";
+export const mediaTypeLookup = contentType;
 
 // -- esbuild --
-// @deno-types="https://deno.land/x/esbuild@v0.14.39/mod.d.ts"
-import esbuildWasm from "https://esm.sh/esbuild-wasm@0.14.39/lib/browser.js?pin=v86&target=deno";
-import * as esbuildNative from "https://deno.land/x/esbuild@v0.14.39/mod.js";
+// @deno-types="https://deno.land/x/esbuild@v0.17.15/mod.d.ts"
+import esbuildWasm from "https://esm.sh/esbuild-wasm@0.17.15/lib/browser.js?pin=v86&target=deno";
+import * as esbuildNative from "https://deno.land/x/esbuild@v0.17.15/mod.js";
 // @ts-ignore trust me
 const esbuild: typeof esbuildWasm =
   Deno.run === undefined ? esbuildWasm : esbuildNative;
@@ -20,8 +21,10 @@ export { esbuild, esbuildWasm as esbuildTypes };
 // export * as importMaps from "https://esm.sh/esbuild-plugin-import-map@2.1.0?pin=v86&target=deno";
 
 // -- @remix-run/xxx --
-export { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&deps=esbuild@0.14.39&target=deno";
-export { createRequestHandler as createRemixRequestHandler } from "https://esm.sh/@remix-run/deno@1.6.0/index.ts?pin=v86&target=deno&deps=react@18.2.0";
+import { defineRoutes as remixDefineRoutes } from "https://esm.sh/@remix-run/dev@1.6.0/config/routes?pin=v86&deps=esbuild@v0.17.15&target=deno";
+export { remixDefineRoutes };
+export { createRequestHandler as createRemixRequestHandler } from "https://esm.sh/@remix-run/deno@1.15.0/index.ts?pin=v86&target=deno&deps=react@18.2.0";
+export type { AppLoadContext } from "https://esm.sh/@remix-run/deno@1.15.0/index.ts?pin=v86&target=deno&deps=react@18.2.0";
 
 // -- remix-flat-routes --
 // export { default as remixFlatRoutes } from "https://esm.sh/remix-flat-routes@0.4.3?pin=v86&target=deno";

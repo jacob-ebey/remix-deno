@@ -1,7 +1,33 @@
 import { path, remixDefineRoutes } from "../deps.ts";
+import { debug } from "../utils/debug.ts";
 import { flatRoutes as remixFlatRoutes } from "./flat-routes.ts";
 
 const ENTRY_EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
+
+type Dev = {
+  port?: number;
+  appServerPort?: number;
+  remixRequestHandlerPath?: string;
+  rebuildPollIntervalMs?: number;
+};
+export type VanillaExtractOptions = {
+  cache?: boolean;
+};
+
+interface FutureConfig {
+  unstable_cssModules: boolean;
+  unstable_cssSideEffectImports: boolean;
+  unstable_dev: boolean | Dev;
+  /** @deprecated Use the `postcss` config option instead */
+  unstable_postcss: boolean;
+  /** @deprecated Use the `tailwind` config option instead */
+  unstable_tailwind: boolean;
+  unstable_vanillaExtract: boolean | VanillaExtractOptions;
+  v2_errorBoundary: boolean;
+  v2_meta: boolean;
+  v2_normalizeFormMethod: boolean;
+  v2_routeConvention: boolean;
+}
 
 export type RemixConfig = {
   appDirectory: string;
@@ -13,6 +39,7 @@ export type RemixConfig = {
   publicPath: string;
   rootDirectory: string;
   routes: ReturnType<typeof remixDefineRoutes>;
+  future: FutureConfig;
 };
 
 export async function loadConfig({
@@ -27,8 +54,9 @@ export async function loadConfig({
   const entryClientFile = await findFile(
     appDirectory,
     "entry.client",
-    ENTRY_EXTENSIONS
+    ENTRY_EXTENSIONS,
   );
+  // debug(entryClientFile);
   if (!entryClientFile) {
     throw new Error("Could not find client entry file");
   }
@@ -69,10 +97,24 @@ export async function loadConfig({
     rootDirectory,
     "import_map.client",
     mode === "development" ? [".dev.json", ".json"] : [".json"]
+
   );
   if (!clientImportMap) {
     throw new Error("Could not find client import map");
   }
+  
+  const future: FutureConfig = {
+    unstable_cssModules: true,
+    unstable_cssSideEffectImports: true,
+    unstable_dev: false,
+    unstable_postcss: true,
+    unstable_tailwind:true,
+    unstable_vanillaExtract: false,
+    v2_errorBoundary:true,
+    v2_meta: true,
+    v2_normalizeFormMethod:true,
+    v2_routeConvention:true,
+  };
 
   return {
     appDirectory,
@@ -81,9 +123,10 @@ export async function loadConfig({
     entryServerFile,
     clientImportMap,
     mode,
-    publicPath: "/build/",
+    publicPath: `${rootDirectory}/build/`,
     rootDirectory,
     routes,
+    future,
   };
 }
 

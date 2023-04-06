@@ -1,6 +1,15 @@
 /** @jsx React.createElement */
+/// <reference lib="dom" />
 import * as React from "react";
-import * as ReactDOM from "react-dom/client";
+import { hydrateRoot } from "react-dom/client";
 import { RemixBrowser } from "remix/react";
 
-ReactDOM.hydrateRoot(document, <RemixBrowser />);
+React.startTransition(() => {
+    hydrateRoot(
+      document,
+      <React.StrictMode>
+        <RemixBrowser />
+      </React.StrictMode>,
+    );
+  });
+  

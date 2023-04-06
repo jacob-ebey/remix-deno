@@ -1,0 +1,12 @@
+{
+  "tasks": {
+    "build": "deno run -A --no-check ./build.ts",
+    "dev": "deno run -A --cached-only --no-clear-screen --watch=app/ --import-map=import_map.server.json ./dev.ts",
+    "devcache": "deno cache --import-map=import_map.server.json ./dev.ts && deno run -A --cached-only --no-check --no-clear-screen --watch=app/ --import-map=import_map.server.json ./dev.ts",
+    "cache": "deno cache --import-map=import_map.server.json ./dev.ts",
+    "start": "deno run -A --import-map=import_map.server.json ./prod.ts"
+  },
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"]
+  }
+}
