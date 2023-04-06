@@ -15,9 +15,9 @@ export default function Index() {
   return (
     <main>
       <h1>{message}</h1>
-      <p>
-        <Link to="/">Home</Link>
-      </p>
+      <nav>
+        {/* <Link to="/second">Home</Link> */}
+      </nav>
     </main>
   );
 }
